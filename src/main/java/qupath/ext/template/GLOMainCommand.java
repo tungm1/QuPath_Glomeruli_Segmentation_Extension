@@ -235,7 +235,7 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
         try {
             // QuPath directory setup based on OS
             String desktopDir = getDesktopDirectory();  // Get the QuPath directory based on the OS
-            String qupathModelDir = desktopDir + "/models_and_pythonfiles";  // Create a models folder in the QuPath directory
+            String qupathModelDir = desktopDir + "/models_and_pythonfiles_v2";  // Create a models folder in the QuPath directory
             Files.createDirectories(Paths.get(qupathModelDir));
 
             // Set folder permissions after creating the directory
@@ -244,16 +244,12 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
 
             // Google Drive direct download links for the .pth files
             String[] pthLinks = {
-                "https://raw.githubusercontent.com/JLY0814/qupath_wcf_extension/refs/heads/main/WCF/model/model1_best.pth",  // model1_best.pth
-                "https://raw.githubusercontent.com/JLY0814/qupath_wcf_extension/refs/heads/main/WCF/model/model2_best.pth",  // model2_best.pth
-                "https://raw.githubusercontent.com/JLY0814/qupath_wcf_extension/refs/heads/main/WCF/model/model3_best.pth",  // model3_best.pth
-                "https://raw.githubusercontent.com/JLY0814/qupath_wcf_extension/refs/heads/main/WCF/model/model4_best.pth",  // model4_best.pth
-                "https://raw.githubusercontent.com/JLY0814/qupath_wcf_extension/refs/heads/main/WCF/model/model5_best.pth"   // model5_best.pth
+                "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/refs/heads/main/Code_to_Michael/checkpoint/best_metric_model_segmentation2d_array.pth",  // model1_best.pth
             };
 
             // URL for the Python scripts ZIP file 
             // FOR MICHAEL - CHANGE THIS FOR RUININGS CODE
-            String zipFileUrl = "https://raw.githubusercontent.com/JLY0814/qupath_wcf_extension/refs/heads/main/WCF/CircleNet_Zip.zip";
+            String zipFileUrl = "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/Code_to_Michael.zip";
 
             // Download resources (Python scripts and .pth files) to the QuPath models directory
             downloadResources(pthLinks, zipFileUrl, qupathModelDir);
@@ -282,7 +278,7 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
             // Prepare Python command to run the downloaded script
             List<String> command = new ArrayList<>();
             command.add("/home/VANDERBILT/tungm1/miniconda3/envs/CircleNet/bin/python3.7");  // Python interpreter
-            command.add(qupathModelDir + "/python_scripts/CircleNet_Zip/src/run_detection_for_scn.py");  // Use the downloaded Python script
+            command.add(qupathModelDir + "glomeruli_segmentation_src/Code_to_Michael/Validation_slide_docker/src/unet_validation_slide.py");  // Use the downloaded Python script
             command.add("circledet");
             command.add("--circle_fusion");
             command.add("--generate_geojson");
