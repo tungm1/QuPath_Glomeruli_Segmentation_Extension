@@ -279,20 +279,43 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
             List<String> command = new ArrayList<>();
             command.add("/home/VANDERBILT/tungm1/miniconda3/envs/CircleNet/bin/python3.7");  // Python interpreter
             command.add(qupathModelDir + "glomeruli_segmentation_src/Code_to_Michael/Validation_slide_docker/src/unet_validation_slide.py");  // Use the downloaded Python script
-            command.add("circledet");
-            command.add("--circle_fusion");
-            command.add("--generate_geojson");
-            command.add("--arch");
-            command.add("dla_34");
-            command.add("--demo");
-            command.add(wholeSlideImagePath);
-            command.add("--load_model_dir");
-            command.add(loadModelDir);  // Use the model directory with downloaded .pth files
-            command.add("--filter_boarder");
-            command.add("--demo_dir");
-            command.add(qupathModelDir + "/test_result");  // Set demo_dir as "test_result"
-            command.add("--target_dir");
-            command.add(qupathModelDir + "/test_only_result");  // Set target_dir as "test_only_result"
+            // command.add("circledet");
+            // command.add("--circle_fusion");
+            // command.add("--generate_geojson");
+            // command.add("--arch");
+            // command.add("dla_34");
+            // command.add("--demo");
+            // command.add(wholeSlideImagePath);
+            // command.add("--load_model_dir");
+            // command.add(loadModelDir);  // Use the model directory with downloaded .pth files
+            // command.add("--filter_boarder");
+            // command.add("--demo_dir");
+            // command.add(qupathModelDir + "/test_result");  // Set demo_dir as "test_result"
+            // command.add("--target_dir");
+            // command.add(qupathModelDir + "/test_only_result");  // Set target_dir as "test_only_result"
+
+            // Docker command
+            command.add("docker");
+            command.add("run");
+            command.add("--rm");
+
+            // Mount the input directory
+            command.add("-v");
+            command.add(inputDirPath + ":/input/:ro");  // Replace inputDirPath with your actual input directory variable
+
+            // Mount the output directory
+            command.add("-v");
+            command.add(outputDirPath + ":/output");  // Replace outputDirPath with your actual output directory variable
+
+            // Enable GPU support
+            command.add("--gpus");
+            command.add("all");
+
+            // Run interactively
+            command.add("-it");
+
+            // Specify the Docker image
+            command.add("hrlblab333/kpis:1.0");
 
             // Run the process
             ProcessBuilder processBuilder = new ProcessBuilder(command);
