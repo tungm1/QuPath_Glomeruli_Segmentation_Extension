@@ -192,15 +192,15 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
             downloadFile(modelUrl, destinationPath);
         }
 
-    // Ensure the 'zip' directory exists
-    File zipDirectory = new File(destinationDir + "/zip");
-    if (!zipDirectory.exists()) {
-        zipDirectory.mkdirs();  // Create the directory if it doesn't exist
-    }
+        // Ensure the 'zip' directory exists
+        File zipDirectory = new File(destinationDir + "/zip");
+        if (!zipDirectory.exists()) {
+            zipDirectory.mkdirs();  // Create the directory if it doesn't exist
+        }
 
-    // Download the Python scripts as a ZIP file from GitHub
-    String zipFileDestination = destinationDir + "/zip/python_scripts.zip";
-    downloadFile(zipFileUrl, zipFileDestination);
+        // Download the Python scripts as a ZIP file from GitHub
+        String zipFileDestination = destinationDir + "/zip/python_scripts.zip";
+        downloadFile(zipFileUrl, zipFileDestination);
 
         // Unzip the file after download
         unzipFile(zipFileDestination, destinationDir + "/python_scripts");
@@ -249,7 +249,7 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
 
             // URL for the Python scripts ZIP file 
             // FOR MICHAEL - CHANGE THIS FOR RUININGS CODE
-            String zipFileUrl = "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/Code_to_Michael.zip";
+            String zipFileUrl = "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/refs/heads/main/Code_to_Michael.zip";
 
             // Download resources (Python scripts and .pth files) to the QuPath models directory
             downloadResources(pthLinks, zipFileUrl, qupathModelDir);
@@ -278,7 +278,7 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
             // Prepare Python command to run the downloaded script
             List<String> command = new ArrayList<>();
             command.add("/home/VANDERBILT/tungm1/miniconda3/envs/CircleNet/bin/python3.7");  // Python interpreter
-            command.add(qupathModelDir + "glomeruli_segmentation_src/Code_to_Michael/Validation_slide_docker/src/unet_validation_slide.py");  // Use the downloaded Python script
+            command.add(qupathModelDir + "/python_scripts/Code_to_Michael/Validation_slide_docker/src/unet_validation_slide.py");  // Use the downloaded Python script
             // command.add("circledet");
             // command.add("--circle_fusion");
             // command.add("--generate_geojson");
@@ -295,24 +295,24 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
             // command.add(qupathModelDir + "/test_only_result");  // Set target_dir as "test_only_result"
 
             // Docker command
-            command.add("docker");
-            command.add("run");
-            command.add("--rm");
+            // command.add("docker");
+            // command.add("run");
+            // command.add("--rm");
 
-            // Mount the input directory
-            command.add("-v");
-            command.add(inputDirPath + ":/input/:ro");  // Replace inputDirPath with your actual input directory variable
+            // // Mount the input directory
+            // command.add("-v");
+            // command.add(inputDirPath + ":/input/:ro");  // Replace inputDirPath with your actual input directory variable
 
-            // Mount the output directory
-            command.add("-v");
-            command.add(outputDirPath + ":/output");  // Replace outputDirPath with your actual output directory variable
+            // // Mount the output directory
+            // command.add("-v");
+            // command.add(outputDirPath + ":/output");  // Replace outputDirPath with your actual output directory variable
 
-            // Enable GPU support
-            command.add("--gpus");
-            command.add("all");
+            // // Enable GPU support
+            // command.add("--gpus");
+            // command.add("all");
 
-            // Run interactively
-            command.add("-it");
+            // // Run interactively
+            // command.add("-it");
 
             // Specify the Docker image
             command.add("hrlblab333/kpis:1.0");
@@ -395,8 +395,6 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
             } catch (IOException e) {
                 logger.error("Failed to read GeoJSON file: " + geojsonFile.getAbsolutePath(), e);
             }
-        } else {
-            logger.warn("GeoJSON file not found: " + geojsonFile.getAbsolutePath());
         }
     }
 }
