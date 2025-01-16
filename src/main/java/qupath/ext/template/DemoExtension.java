@@ -18,57 +18,52 @@ import qupath.lib.gui.extensions.QuPathExtension;
 import qupath.lib.gui.prefs.PathPrefs;
 
 import java.io.IOException;
-
 import java.util.List;
 import java.util.ArrayList;
-import qupath.lib.objects.PathObject; // 导入 PathObject 类
+import qupath.lib.objects.PathObject;
 
 
 
 /**
  * This is a demo to provide a template for creating a new QuPath extension.
- * <p>
+ * 
  * It doesn't do much - it just shows how to add a menu item and a preference.
  * See the code and comments below for more info.
- * <p>
- * <b>Important!</b> For your extension to work in QuPath, you need to make sure the name &amp; package
- * of this class is consistent with the file
- * <pre>
- *     /resources/META-INF/services/qupath.lib.gui.extensions.QuPathExtension
- * </pre>
+ * 
+ * Important! For your extension to work in QuPath, you need to make sure the name and package
+ * of this class is consistent with the file:
+ * 
+ * /resources/META-INF/services/qupath.lib.gui.extensions.QuPathExtension
+ * 
  */
 public class DemoExtension implements QuPathExtension, GitHubProject {
 	
 	private static final Logger logger = LoggerFactory.getLogger(DemoExtension.class);
 
 	/**
-	 * Display name for your extension
-	 * TODO: define this
+	 * Display name for extension
 	 */
-	private static final String EXTENSION_NAME = "My Java extension";
+	private static final String EXTENSION_NAME = "KPI Extension";
 
 	/**
 	 * Short description, used under 'Extensions > Installed extensions'
-	 * TODO: define this
 	 */
-	private static final String EXTENSION_DESCRIPTION = "This is just a demo to show how extensions work";
+	private static final String EXTENSION_DESCRIPTION = "QuPath extension for KPIs";
 
 	/**
 	 * QuPath version that the extension is designed to work with.
 	 * This allows QuPath to inform the user if it seems to be incompatible.
-	 * TODO: define this
 	 */
-	private static final Version EXTENSION_QUPATH_VERSION = Version.parse("v0.5.0");
+	private static final Version EXTENSION_QUPATH_VERSION = Version.parse("v0.5.1");
 
 	/**
 	 * GitHub repo that your extension can be found at.
 	 * This makes it easier for users to find updates to your extension.
 	 * If you don't want to support this feature, you can remove
 	 * references to GitHubRepo and GitHubProject from your extension.
-	 * TODO: define this
 	 */
 	private static final GitHubRepo EXTENSION_REPOSITORY = GitHubRepo.create(
-			EXTENSION_NAME, "myGitHubUserName", "myGitHubRepo");
+			EXTENSION_NAME, "tungm1", "QuPath_Glomeruli_Segmentation_Extension");
 
 	/**
 	 * Flag whether the extension is already installed (might not be needed... but we'll do it anyway)
@@ -158,19 +153,17 @@ public class DemoExtension implements QuPathExtension, GitHubProject {
 	 */
 	private void addMenuItem(QuPathGUI qupath) {
 		var menu = qupath.getMenu("Extensions>" + EXTENSION_NAME, true);
-		MenuItem menuItem = new MenuItem("Run Glo Detection");
+		MenuItem menuItem = new MenuItem("Run KPI");
 		menuItem.setOnAction(e -> {
 		    try {
-			// 创建 GLOMainCommand 实例，并传递 QuPathGUI、pythonScriptPath 和 targetDir
-			//String pythonScriptPath = "/data/CircleNet/src/run_detection_for_scn.py"; // 设置正确的 Python 脚本路径
-			//String targetDir = "/data/CircleNet/data/new_data_for_miccai_paper/test/test_geojson/test_only_result"; // 设置目标目录
+			// Create a gloCommand instance, and pass in qupath
 
 			GLOMainCommand gloCommand = new GLOMainCommand(qupath);
 
-			// 提交任务
+			// Submit task
 			gloCommand.submitDetectionTask();
 		    } catch (Exception ex) {
-			Dialogs.showErrorMessage("Error", "Failed to run GLO Command: " + ex.getMessage());
+			Dialogs.showErrorMessage("Error", "Failed to run KPI Command: " + ex.getMessage());
 		    }
 		});
 		menu.getItems().add(menuItem);
@@ -215,4 +208,3 @@ public class DemoExtension implements QuPathExtension, GitHubProject {
 		return EXTENSION_REPOSITORY;
 	}
 }
-

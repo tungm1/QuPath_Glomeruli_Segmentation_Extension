@@ -47,8 +47,6 @@ public class GLOMainCommand {
     private String serverURL; // 服务器URL
     private String targetDir; // 目标目录
 
-
-    // FOR MICHAEL - THIS IS THE CONSTRUCTOR
     public GLOMainCommand(QuPathGUI qupath) {
         this.qupath = qupath;
     }
@@ -71,7 +69,6 @@ public class GLOMainCommand {
     Files.setPosixFilePermissions(path, perms);
     }
 
-// FOR MICHAEL - THIS IS USED IN THE SUBMITDETECTIONTASK() FUNCTION
 public void downloadFile(String fileUrl, String destinationPath) throws IOException {
     File destinationFile = new File(destinationPath);
 
@@ -180,8 +177,21 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
         return destFile;
     }
 
+    public void createInitialDirs() throws IOException {
+        String desktopDir = getDesktopDirectory();
+
+
+        File inputDir = new File(desktopDir + "/input_slide/");
+        if (!inputDir.exists()) inputDir.mkdirs();
+
+        File outputDir = new File(desktopDir + "/output_slide/");
+        if (!outputDir.exists()) outputDir.mkdirs();
+
+        File modelDir = new File(desktopDir + "/model/");
+        if (!modelDir.exists()) modelDir.mkdirs();
+    }
+
     // Method to download .pth files and Python scripts
-    // FOR MICHAEL - THIS IS USED IN THE SUBMITDETECTIONTASK() FUNCTION
     public void downloadResources(String[] pthLinks, String zipFileUrl, String destinationDir) throws IOException {
         // Download all .pth files
         for (String modelUrl : pthLinks) {
@@ -206,7 +216,6 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
     }
 
     // Method to determine the Desktop directory and create 'QuPath_extension_model' folder
-    // FOR MICHAEL - THIS IS USED IN THE SUBMITDETECTIONTASK() FUNCTION
     public String getDesktopDirectory() throws IOException {
         String desktopDir = null;
         String os = System.getProperty("os.name").toLowerCase();
@@ -247,8 +256,10 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
             };
 
             // URL for the Python scripts ZIP file 
-            // FOR MICHAEL - CHANGE THIS FOR RUININGS CODE
             String zipFileUrl = "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/refs/heads/main/Code_to_Michael.zip";
+
+            // Make initial directories for py script
+            createInitialDirs();
 
             // Download resources (Python scripts and .pth files) to the QuPath models directory
             downloadResources(pthLinks, zipFileUrl, qupathModelDir);
@@ -260,7 +271,7 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
             String rawPath = qupath.getViewer().getImageData().getServer().getPath();
             String wholeSlideImagePath = rawPath.contains("file:") ? rawPath.split("file:")[1].trim() : rawPath;
 
-            wholeSlideImagePath = wholeSlideImagePath.replaceAll("\\[--series, 0\\]$", ""); // FOR MICHAEL - THIS WAS DONE BY YOU
+            wholeSlideImagePath = wholeSlideImagePath.replaceAll("\\[--series, 0\\]$", "");
             System.out.println("Extracted Whole Slide Image Path: " + wholeSlideImagePath);
 
             // Generate GeoJSON file path based on WSI name
@@ -353,16 +364,9 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
         } catch (IOException | InterruptedException e) {
             logger.error("Error during process execution", e);
         }
-
-
     }
 
-
-
-
-
     // 方法用于生成 GeoJSON 保存目录路径
-    // FOR MICHAEL - THIS IS USED IN THE SUBMITDETECTIONTASK() FUNCTION
     private String generateGeoJsonPath(String targetDir) {
         Path targetDirPath = Paths.get(targetDir);
         String baseName = targetDirPath.getFileName().toString();
@@ -371,7 +375,6 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
     }
 
     // 方法用于解析 Python 输出并加载 GeoJSON 文件到 QuPath
-    // FOR MICHAEL - THIS IS USED IN THE SUBMITDETECTIONTASK() FUNCTION
     private void parsePythonOutput(String output, String geojsonDir, String wsiName) {
         // 此处可以添加对 Python 输出的解析逻辑
 
@@ -380,7 +383,6 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
     }
 
     // 方法用于加载 GeoJSON 文件到 QuPath
-    // FOR MICHAEL - THIS IS USED IN THE SUBMITDETECTIONTASK() FUNCTION
     private void loadGeoJsonToQuPath(String geojsonDir, String wsiName) {
         File geojsonFile = new File(geojsonDir, wsiName); // 使用生成的 GeoJSON 文件名
         if (geojsonFile.exists()) {
