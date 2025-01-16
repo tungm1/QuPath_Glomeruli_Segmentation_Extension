@@ -5,7 +5,7 @@ import javafx.concurrent.Task;
 import qupath.lib.io.PathIO;
 import java.io.InputStream;
 import java.io.FileInputStream; 
-import java.io.FileOutputStream;  // <-- Add this line
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,15 +20,15 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-imageio
+
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-
-import java.io.*;imageio
+import java.io.*;
 import java.net.*;
 import java.nio.file.*;
 import java.util.zip.ZipEntry;
