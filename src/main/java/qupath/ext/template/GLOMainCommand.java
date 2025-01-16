@@ -20,8 +20,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import org.slf4j.Logger;
+imageio
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
@@ -29,7 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
-import java.io.*;
+import java.io.*;imageio
 import java.net.*;
 import java.nio.file.*;
 import java.util.zip.ZipEntry;
@@ -294,7 +293,7 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
             // command.add("--target_dir");
             // command.add(qupathModelDir + "/test_only_result");  // Set target_dir as "test_only_result"
 
-            // Docker command
+            // Docker command 
             // command.add("docker");
             // command.add("run");
             // command.add("--rm");
