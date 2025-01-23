@@ -43,9 +43,9 @@ import java.util.HashSet;
 public class GLOMainCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(GLOMainCommand.class);
-    private final QuPathGUI qupath; // QuPath GUI 实例
-    private String serverURL; // 服务器URL
-    private String targetDir; // 目标目录
+    private final QuPathGUI qupath;
+    private String serverURL;
+    private String targetDir;
 
     public GLOMainCommand(QuPathGUI qupath) {
         this.qupath = qupath;
@@ -69,64 +69,61 @@ public class GLOMainCommand {
     Files.setPosixFilePermissions(path, perms);
     }
 
-public void downloadFile(String fileUrl, String destinationPath) throws IOException {
-    File destinationFile = new File(destinationPath);
+    public void downloadFile(String fileUrl, String destinationPath) throws IOException {
+        File destinationFile = new File(destinationPath);
 
-    // Check if the file already exists
-    if (destinationFile.exists()) {
-        System.out.println("File already exists: " + destinationPath);
-        return;
-    }
-
-    URL url = new URL(fileUrl);
-    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-    connection.setInstanceFollowRedirects(true);  // Automatically follow redirects
-    connection.setRequestMethod("GET");
-    connection.connect();
-
-    int status = connection.getResponseCode();
-    if (status != HttpURLConnection.HTTP_OK) {
-        // Handle redirects (e.g., 303, 302, etc.)
-        if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM ||
-            status == HttpURLConnection.HTTP_SEE_OTHER) {
-            String newUrl = connection.getHeaderField("Location");
-            connection = (HttpURLConnection) new URL(newUrl).openConnection();
-            connection.connect();
-        } else {
-            throw new IOException("Failed to download file: " + connection.getResponseCode());
+        // Check if the file already exists
+        if (destinationFile.exists()) {
+            System.out.println("File already exists: " + destinationPath);
+            return;
         }
-    }
 
-    try (InputStream inputStream = connection.getInputStream();
-         FileOutputStream outputStream = new FileOutputStream(destinationFile)) {
+        URL url = new URL(fileUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setInstanceFollowRedirects(true);  // Automatically follow redirects
+        connection.setRequestMethod("GET");
+        connection.connect();
 
-        byte[] buffer = new byte[1024];
-        int bytesRead;
-        while ((bytesRead = inputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, bytesRead);
-        }
-    }
-
-    System.out.println("Downloaded: " + destinationPath);
-    setFolderPermissions(destinationPath);
-
-}
-
-
-// Helper method to parse confirmation token from Google Drive HTML page
-private String parseConfirmationToken(HttpURLConnection connection) throws IOException {
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-        String line;
-        while ((line = reader.readLine()) != null) {
-            if (line.contains("confirm")) {
-                // Extract the token from the HTML
-                String token = line.split("confirm=")[1].split("&")[0];
-                return token;
+        int status = connection.getResponseCode();
+        if (status != HttpURLConnection.HTTP_OK) {
+            // Handle redirects (e.g., 303, 302, etc.)
+            if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM ||
+                status == HttpURLConnection.HTTP_SEE_OTHER) {
+                String newUrl = connection.getHeaderField("Location");
+                connection = (HttpURLConnection) new URL(newUrl).openConnection();
+                connection.connect();
+            } else {
+                throw new IOException("Failed to download file: " + connection.getResponseCode());
             }
         }
+        
+        try (InputStream inputStream = connection.getInputStream();
+            FileOutputStream outputStream = new FileOutputStream(destinationFile)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        }
+        System.out.println("Downloaded: " + destinationPath);
+        setFolderPermissions(destinationPath);
     }
-    return null;
-}
+
+
+    // Helper method to parse confirmation token from Google Drive HTML page
+    private String parseConfirmationToken(HttpURLConnection connection) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("confirm")) {
+                    // Extract the token from the HTML
+                    String token = line.split("confirm=")[1].split("&")[0];
+                    return token;
+                }
+            }
+        }
+        return null;
+    }
 
     // Method to unzip a .zip file
     public void unzipFile(String zipFilePath, String destDir) throws IOException {
@@ -355,18 +352,18 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
                 logger.info("Python script output: " + output.toString());
             }
 
-                // 调用生成 GeoJSON 路径的方法
-        String targetDir= qupathModelDir + "/test_only_result";
-        String geojsonDir = generateGeoJsonPath(targetDir);  // targetDir 替换 xml_dir
-        // 解析输出结果
-        parsePythonOutput(output.toString(), geojsonDir, wsiName);
-
+            // Call the method of generating Geojson path
+            String targetDir= qupathModelDir + "/test_only_result";
+            String geojsonDir = generateGeoJsonPath(targetDir);  // targetDir replaced by geojsonDir
+            // Output results
+            parsePythonOutput(output.toString(), geojsonDir, wsiName);
+            
         } catch (IOException | InterruptedException e) {
             logger.error("Error during process execution", e);
         }
     }
 
-    // 方法用于生成 GeoJSON 保存目录路径
+    // Methods to generate Geojson to save directory paths
     private String generateGeoJsonPath(String targetDir) {
         Path targetDirPath = Paths.get(targetDir);
         String baseName = targetDirPath.getFileName().toString();
@@ -374,28 +371,30 @@ private String parseConfirmationToken(HttpURLConnection connection) throws IOExc
         return geoJsonDir;
     }
 
-    // 方法用于解析 Python 输出并加载 GeoJSON 文件到 QuPath
+    // The method is used to analyze Python output and load the Geojson file to Qupath
     private void parsePythonOutput(String output, String geojsonDir, String wsiName) {
-        // 此处可以添加对 Python 输出的解析逻辑
+        // Here you can add analytical logic of python output
 
-        // 加载生成的 GeoJSON 文件
+        // Load the generated Geojson file
         loadGeoJsonToQuPath(geojsonDir, wsiName);
     }
 
-    // 方法用于加载 GeoJSON 文件到 QuPath
+    // The method is used to load the Geojson file to Qupath
     private void loadGeoJsonToQuPath(String geojsonDir, String wsiName) {
-        File geojsonFile = new File(geojsonDir, wsiName); // 使用生成的 GeoJSON 文件名
+        File geojsonFile = new File(geojsonDir, wsiName); // Use the generated Geojson file name
         if (geojsonFile.exists()) {
-            // 获取文件的输入流
+            // Get the input stream of the file
             try (InputStream inputStream = new FileInputStream(geojsonFile)) {
-                // 使用 PathIO 提供的 readObjectsFromGeoJSON 方法读取 GeoJSON 文件
+                // Use the readObjectsFromGeoJSON method provided by Pathio to read the Geojson file
                 List<PathObject> objects = PathIO.readObjectsFromGeoJSON(inputStream);
-                // 将对象添加到 QuPath 的层次结构中
+                // Add the object to the hierarchical structure of Qupath
                 qupath.getViewer().getImageData().getHierarchy().addPathObjects(objects);
                 logger.info("GeoJSON file loaded successfully: " + geojsonFile.getAbsolutePath());
             } catch (IOException e) {
                 logger.error("Failed to read GeoJSON file: " + geojsonFile.getAbsolutePath(), e);
             }
+        } else {
+            logger.error("GeoJSON file does not exist: " + geojsonFile.getAbsolutePath(), e);
         }
     }
 }
