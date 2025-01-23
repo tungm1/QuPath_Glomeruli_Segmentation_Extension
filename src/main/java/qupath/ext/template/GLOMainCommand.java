@@ -174,9 +174,10 @@ public class GLOMainCommand {
         return destFile;
     }
 
-    public void createInitialDirs() throws IOException {
+    public ArrayList<File> createInitialDirs() throws IOException {
         String desktopDir = getDesktopDirectory();
 
+        ArrayList<File> iomDirs = new ArrayList<File>();
 
         File inputDir = new File(desktopDir + "/input_slide/");
         if (!inputDir.exists()) inputDir.mkdirs();
@@ -186,7 +187,15 @@ public class GLOMainCommand {
 
         File modelDir = new File(desktopDir + "/model/");
         if (!modelDir.exists()) modelDir.mkdirs();
+
+        iomDirs.add(inputDir);
+        iomDirs.add(outputDir);
+        iomDirs.add(modelDir);
+
+        return iomDirs;
     }
+
+    
 
     // Method to download .pth files and Python scripts
     public void downloadResources(String[] pthLinks, String zipFileUrl, String destinationDir) throws IOException {
@@ -255,8 +264,9 @@ public class GLOMainCommand {
             // URL for the Python scripts ZIP file 
             String zipFileUrl = "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/refs/heads/main/Code_to_Michael.zip";
 
+            
             // Make initial directories for py script
-            createInitialDirs();
+            ArrayList<File> iomDirs = createInitialDirs();
 
             // Download resources (Python scripts and .pth files) to the QuPath models directory
             downloadResources(pthLinks, zipFileUrl, qupathModelDir);
@@ -271,8 +281,17 @@ public class GLOMainCommand {
             wholeSlideImagePath = wholeSlideImagePath.replaceAll("\\[--series, 0\\]$", "");
             System.out.println("Extracted Whole Slide Image Path: " + wholeSlideImagePath);
 
+            File tempWSI = new File(wholeSlideImagePath);
+
             // Generate GeoJSON file path based on WSI name
-            String wsiName = new File(wholeSlideImagePath).getName();
+            String wsiName = tempWSI.getName();
+            
+            Path sourceP = tempWSI.toPath();
+            Path newdirP = iomDirs.get(0).toPath();
+
+            Files.copy(sourceP, newdirP.resolve(sourceP.getFileName()));
+
+
             if (wsiName.endsWith(".svs")) {
                 wsiName = wsiName.replace(".svs", ".geojson");
             } else if (wsiName.endsWith(".scn")) {
