@@ -15,7 +15,7 @@ ext.moduleName = 'io.github.qupath.extension.template'
 base {
     archivesName = rootProject.name
     //version = '0.0.1-SNAPSHOT'
-    version = '0.5.0'
+    version = '0.5.1'
     description = 'A simple QuPath extension template'
 }
 
