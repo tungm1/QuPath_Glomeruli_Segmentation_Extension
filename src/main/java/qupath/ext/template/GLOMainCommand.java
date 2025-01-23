@@ -110,20 +110,7 @@ public class GLOMainCommand {
     }
 
 
-    // Helper method to parse confirmation token from Google Drive HTML page
-    private String parseConfirmationToken(HttpURLConnection connection) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains("confirm")) {
-                    // Extract the token from the HTML
-                    String token = line.split("confirm=")[1].split("&")[0];
-                    return token;
-                }
-            }
-        }
-        return null;
-    }
+    
 
     // Method to unzip a .zip file
     public void unzipFile(String zipFilePath, String destDir) throws IOException {
@@ -258,7 +245,7 @@ public class GLOMainCommand {
 
             // Google Drive direct download links for the .pth files
             String[] pthLinks = {
-                "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/refs/heads/main/Code_to_Michael/checkpoint/best_metric_model_segmentation2d_array.pth",  // model1_best.pth
+                "https://drive.google.com/drive/folders/1ORYOhx-dqZ5CTeDLvwTSgLsueW4phBNJ?usp=drive_link",
             };
 
             // URL for the Python scripts ZIP file 
