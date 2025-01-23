@@ -236,8 +236,12 @@ public class GLOMainCommand {
         try {
             // QuPath directory setup based on OS
             String desktopDir = getDesktopDirectory();  // Get the QuPath directory based on the OS
-            String qupathModelDir = desktopDir + "/models_and_pythonfiles_v2";  // Create a models folder in the QuPath directory
-            Files.createDirectories(Paths.get(qupathModelDir));
+            //String qupathModelDir = desktopDir + "/models_and_pythonfiles_v2";  // Create a models folder in the QuPath directory
+            //Files.createDirectories(Paths.get(qupathModelDir));
+
+            ArrayList<File> iomDirs = createInitialDirs();
+
+            String qupathModelDir = iomDirs.get(2).toPath().toString();
 
             // Set folder permissions after creating the directory
             setFolderPermissions(qupathModelDir);
@@ -245,7 +249,7 @@ public class GLOMainCommand {
 
             // Google Drive direct download links for the .pth files
             String[] pthLinks = {
-                "https://drive.google.com/drive/folders/1ORYOhx-dqZ5CTeDLvwTSgLsueW4phBNJ?usp=drive_link",
+                "https://drive.google.com/file/d/1goC3ooPYogjkIN-4N_AgKAYCk8mCJE7u",
             };
 
             // URL for the Python scripts ZIP file 
@@ -253,13 +257,13 @@ public class GLOMainCommand {
 
             
             // Make initial directories for py script
-            ArrayList<File> iomDirs = createInitialDirs();
+            
 
             // Download resources (Python scripts and .pth files) to the QuPath models directory
             downloadResources(pthLinks, zipFileUrl, qupathModelDir);
 
             // Set the directory where the models and Python scripts are located
-            String loadModelDir = qupathModelDir;
+            // String loadModelDir = qupathModelDir;
 
             // Get WSI path
             String rawPath = qupath.getViewer().getImageData().getServer().getPath();
