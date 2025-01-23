@@ -394,7 +394,7 @@ public class GLOMainCommand {
                 logger.error("Failed to read GeoJSON file: " + geojsonFile.getAbsolutePath(), e);
             }
         } else {
-            logger.error("GeoJSON file does not exist: " + geojsonFile.getAbsolutePath(), e);
+            logger.error("GeoJSON file does not exist: " + geojsonFile.getAbsolutePath());
         }
     }
 }
