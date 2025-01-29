@@ -175,9 +175,17 @@ public class GLOMainCommand {
         File modelDir = new File(desktopDir + "/model/");
         if (!modelDir.exists()) modelDir.mkdirs();
 
+        File x20Dir = new File(desktopDir + "/X20/");
+        if (!x20Dir.exists()) x20Dir.mkdirs();
+
+        File x20pDir = new File(desktopDir + "/X20p/");
+        if (!x20pDir.exists()) x20pDir.mkdirs();
+
         iomDirs.add(inputDir);
         iomDirs.add(outputDir);
         iomDirs.add(modelDir);
+        iomDirs.add(x20Dir);
+        iomDirs.add(x20pDir);
 
         return iomDirs;
     }
@@ -294,6 +302,11 @@ public class GLOMainCommand {
             List<String> command = new ArrayList<>();
             command.add("/home/VANDERBILT/tungm1/miniconda3/envs/CircleNet/bin/python3.7");  // Python interpreter
             command.add(qupathModelDir + "/python_scripts/Code_to_Michael/Validation_slide_docker/src/unet_validation_slide.py");  // Use the downloaded Python script
+            command.add("--data_dir " + iomDirs.get(0));
+            command.add("--model_dir " + iomDirs.get(2));
+            command.add("--output_dir " + iomDirs.get(1));
+            command.add("--X20_dir " + iomDirs.get(3));
+            command.add("--X20_patch_dir " + iomDirs.get(4));
 
 
             // Run the process
