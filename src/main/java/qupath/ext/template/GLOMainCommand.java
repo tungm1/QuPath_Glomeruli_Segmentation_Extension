@@ -74,8 +74,8 @@ public class GLOMainCommand {
 
         // Check if the file already exists
         if (destinationFile.exists()) {
-            System.out.println("File already exists: " + destinationPath);
-            return;
+            destinationFile.delete();
+            // System.out.println("File already exists: " + destinationPath);
         }
 
         URL url = new URL(fileUrl);
@@ -109,77 +109,30 @@ public class GLOMainCommand {
         setFolderPermissions(destinationPath);
     }
 
-
-    
-
-    // Method to unzip a .zip file
-    public void unzipFile(String zipFilePath, String destDir) throws IOException {
-        File dir = new File(destDir);
-        if (!dir.exists()) dir.mkdirs();
-
-        try (FileInputStream fis = new FileInputStream(zipFilePath);
-             ZipInputStream zis = new ZipInputStream(fis)) {
-            ZipEntry zipEntry = zis.getNextEntry();
-            while (zipEntry != null) {
-                File newFile = newFile(dir, zipEntry);
-                if (zipEntry.isDirectory()) {
-                    if (!newFile.isDirectory() && !newFile.mkdirs()) {
-                        throw new IOException("Failed to create directory " + newFile);
-                    }
-                } else {
-                    // fix for Windows-created archives
-                    File parent = newFile.getParentFile();
-                    if (!parent.isDirectory() && !parent.mkdirs()) {
-                        throw new IOException("Failed to create directory " + parent);
-                    }
-
-                    // write file content
-                    try (FileOutputStream fos = new FileOutputStream(newFile)) {
-                        byte[] buffer = new byte[1024];
-                        int len;
-                        while ((len = zis.read(buffer)) > 0) {
-                            fos.write(buffer, 0, len);
-                        }
-                    }
-                }
-                zipEntry = zis.getNextEntry();
-            }
-            zis.closeEntry();
-        }
-    }
-
-    private static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
-
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-
-        return destFile;
-    }
-
     public ArrayList<File> createInitialDirs() throws IOException {
         String desktopDir = getDesktopDirectory();
 
         ArrayList<File> iomDirs = new ArrayList<File>();
 
         File inputDir = new File(desktopDir + "/input_slide/");
-        if (!inputDir.exists()) inputDir.mkdirs();
+        if (inputDir.exists()) inputDir.delete();
+        inputDir.mkdirs();
 
         File outputDir = new File(desktopDir + "/output_slide/");
-        if (!outputDir.exists()) outputDir.mkdirs();
+        if (outputDir.exists()) outputDir.delete();
+        outputDir.mkdirs();
 
         File modelDir = new File(desktopDir + "/model/");
-        if (!modelDir.exists()) modelDir.mkdirs();
+        if (modelDir.exists()) modelDir.delete();
+        modelDir.mkdirs();
 
         File x20Dir = new File(desktopDir + "/X20/");
-        if (!x20Dir.exists()) x20Dir.mkdirs();
+        if (x20Dir.exists()) x20Dir.delete();
+        x20Dir.mkdirs();
 
         File x20pDir = new File(desktopDir + "/X20p/");
-        if (!x20pDir.exists()) x20pDir.mkdirs();
+        if (x20pDir.exists()) x20pDir.delete();
+        x20pDir.mkdirs();
 
         iomDirs.add(inputDir);
         iomDirs.add(outputDir);
@@ -193,27 +146,17 @@ public class GLOMainCommand {
     
 
     // Method to download .pth files and Python scripts
-    public void downloadResources(String[] pthLinks, String zipFileUrl, String destinationDir) throws IOException {
+    public void downloadResources(String pthLink, String pyURL, String destinationDir) throws IOException {
         // Download all .pth files
-        for (String modelUrl : pthLinks) {
-            String[] urlParts = modelUrl.split("/");
-            String pthFileName = urlParts[urlParts.length - 1];  // Extract the original file name from the URL
-            String destinationPath = destinationDir + "/" + pthFileName;
-            downloadFile(modelUrl, destinationPath);
-        }
+        String[] urlParts = pthLink.split("/");
+        String pthFileName = urlParts[urlParts.length - 1];  // Extract the original file name from the URL
+        String destinationPath = destinationDir + "/" + pthFileName;
+        downloadFile(pthLink, destinationPath);
 
-        // Ensure the 'zip' directory exists
-        File zipDirectory = new File(destinationDir + "/zip");
-        if (!zipDirectory.exists()) {
-            zipDirectory.mkdirs();  // Create the directory if it doesn't exist
-        }
-
-        // Download the Python scripts as a ZIP file from GitHub
-        String zipFileDestination = destinationDir + "/zip/python_scripts.zip";
-        downloadFile(zipFileUrl, zipFileDestination);
-
-        // Unzip the file after download
-        unzipFile(zipFileDestination, destinationDir + "/python_scripts");
+        urlParts = pyURL.split("/");
+        String pyFileName = urlParts[urlParts.length - 1];  // Extract the original file name from the URL
+        destinationPath = destinationDir + "/" + pyFileName;
+        downloadFile(pyURL, destinationPath);
     }
 
     // Method to determine the Desktop directory and create 'QuPath_extension_model' folder
@@ -254,21 +197,14 @@ public class GLOMainCommand {
             // Set folder permissions after creating the directory
             setFolderPermissions(qupathModelDir);
     
-
             // direct download links for the .pth file
-            String[] pthLinks = {
-                "https://github.com/tungm1/QuPath_Glomeruli_Segmentation_Extension/raw/refs/heads/main/mask2former_swin_b_kpis_768_best_mDice.pth",
-            };
+            String pthLink = "https://github.com/tungm1/QuPath_Glomeruli_Segmentation_Extension/raw/refs/heads/main/mask2former_swin_b_kpis_768_best_mDice.pth";
 
-            // URL for the Python scripts ZIP file 
-            String zipFileUrl = "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/refs/heads/main/Code_to_Michael.zip";
-
-            
-            // Make initial directories for py script
-            
+            // URL for the Python scripts
+            String pyURL = "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/refs/heads/main/Code_to_Michael/Validation_slide_docker/src/unet_validation_slide.py";
 
             // Download resources (Python scripts and .pth files) to the QuPath models directory
-            downloadResources(pthLinks, zipFileUrl, qupathModelDir);
+            downloadResources(pthLink, pyURL, qupathModelDir);
 
             // Set the directory where the models and Python scripts are located
             // String loadModelDir = qupathModelDir;
@@ -301,12 +237,17 @@ public class GLOMainCommand {
             // Prepare Python command to run the downloaded script
             List<String> command = new ArrayList<>();
             command.add("/home/VANDERBILT/tungm1/miniconda3/envs/CircleNet/bin/python3.7");  // Python interpreter
-            command.add(qupathModelDir + "/python_scripts/Code_to_Michael/Validation_slide_docker/src/unet_validation_slide.py");  // Use the downloaded Python script
-            command.add("--data_dir " + iomDirs.get(0));
-            command.add("--model_dir " + iomDirs.get(2));
-            command.add("--output_dir " + iomDirs.get(1));
-            command.add("--X20_dir " + iomDirs.get(3));
-            command.add("--X20_patch_dir " + iomDirs.get(4));
+            command.add(qupathModelDir + "/unet_validation_slide.py");  // Use the downloaded Python script
+            command.add("--data_dir");
+            command.add(iomDirs.get(0).toPath().toString());
+            command.add("--model_dir");
+            command.add(iomDirs.get(2).toPath().toString());
+            command.add("--output_dir");
+            command.add(iomDirs.get(1).toPath().toString());
+            command.add("--X20_dir");
+            command.add(iomDirs.get(3).toPath().toString());
+            command.add("--X20_patch_dir");
+            command.add(iomDirs.get(4).toPath().toString());
 
 
             // Run the process
