@@ -146,12 +146,15 @@ public class GLOMainCommand {
     
 
     // Method to download .pth files and Python scripts
-    public void downloadResources(String pthLink, String pyURL, String destinationDir) throws IOException {
+    public void downloadResources(String pthLink, String configLink, String pyURL, String destinationDir) throws IOException {
         // Download all .pth files
         String[] urlParts = pthLink.split("/");
         String pthFileName = urlParts[urlParts.length - 1];  // Extract the original file name from the URL
         String destinationPath = destinationDir + "/" + pthFileName;
         downloadFile(pthLink, destinationPath);
+
+        String destinationPath = destinationDir + "/" + "config.py";
+        downloadFile(configLink, destinationPath);
 
         urlParts = pyURL.split("/");
         String pyFileName = urlParts[urlParts.length - 1];  // Extract the original file name from the URL
@@ -197,14 +200,17 @@ public class GLOMainCommand {
             // Set folder permissions after creating the directory
             setFolderPermissions(qupathModelDir);
     
-            // direct download links for the .pth file
+            // direct download link for the .pth file
             String pthLink = "https://github.com/tungm1/QuPath_Glomeruli_Segmentation_Extension/raw/refs/heads/main/mask2former_swin_b_kpis_768_best_mDice.pth";
+
+            // direct download link for the model's config file
+            String configLink = "https://raw.githubusercontent.com/tungm1/QuPath_Glomeruli_Segmentation_Extension/refs/heads/main/mask2former_swin-b_kpis_isbi_768.py";
 
             // URL for the Python scripts
             String pyURL = "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/refs/heads/main/Code_to_Michael/Validation_slide_docker/src/unet_validation_slide.py";
 
             // Download resources (Python scripts and .pth files) to the QuPath models directory
-            downloadResources(pthLink, pyURL, qupathModelDir);
+            downloadResources(pthLink, configLink, pyURL, qupathModelDir);
 
             // Set the directory where the models and Python scripts are located
             // String loadModelDir = qupathModelDir;
