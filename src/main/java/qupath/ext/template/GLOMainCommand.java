@@ -148,7 +148,7 @@ public class GLOMainCommand {
         String destinationPath = destinationDir + "/" + pthFileName;
         downloadFile(pthLink, destinationPath);
 
-        String destinationPath = destinationDir + "/" + "config.py";
+        destinationPath = destinationDir + "/" + "config.py";
         downloadFile(configLink, destinationPath);
 
         urlParts = pyURL.split("/");
@@ -237,7 +237,7 @@ public class GLOMainCommand {
 
             // Prepare Python command to run the downloaded script
             List<String> command = new ArrayList<>();
-            command.add("/home/VANDERBILT/tungm1/miniconda3/envs/CircleNet/bin/python3.7");  // Python interpreter
+            command.add("/home/VANDERBILT/tungm1/miniconda3/bin/python");  // Python interpreter
             command.add(qupathModelDir + "/inference_wsi_level_kpis.py");  // Use the downloaded Python script
             command.add("--input");
             command.add(iomDirs.get(0).toPath().toString());
