@@ -126,19 +126,14 @@ public class GLOMainCommand {
         if (modelDir.exists()) modelDir.delete();
         modelDir.mkdirs();
 
-        File x20Dir = new File(desktopDir + "/X20/");
-        if (x20Dir.exists()) x20Dir.delete();
-        x20Dir.mkdirs();
-
-        File x20pDir = new File(desktopDir + "/X20p/");
-        if (x20pDir.exists()) x20pDir.delete();
-        x20pDir.mkdirs();
+        File configDir = new File(desktopDir + "/config/");
+        if (configDir.exists()) configDir.delete();
+        configDir.mkdirs();
 
         iomDirs.add(inputDir);
         iomDirs.add(outputDir);
         iomDirs.add(modelDir);
-        iomDirs.add(x20Dir);
-        iomDirs.add(x20pDir);
+        iomDirs.add(configDir);
 
         return iomDirs;
     }
@@ -207,7 +202,7 @@ public class GLOMainCommand {
             String configLink = "https://raw.githubusercontent.com/tungm1/QuPath_Glomeruli_Segmentation_Extension/refs/heads/main/mask2former_swin-b_kpis_isbi_768.py";
 
             // URL for the Python scripts
-            String pyURL = "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/refs/heads/main/Code_to_Michael/Validation_slide_docker/src/unet_validation_slide.py";
+            String pyURL = "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/refs/heads/main/Code_to_Michael/Validation_slide_docker/src/inference_wsi_level_kpis.py";
 
             // Download resources (Python scripts and .pth files) to the QuPath models directory
             downloadResources(pthLink, configLink, pyURL, qupathModelDir);
@@ -243,18 +238,18 @@ public class GLOMainCommand {
             // Prepare Python command to run the downloaded script
             List<String> command = new ArrayList<>();
             command.add("/home/VANDERBILT/tungm1/miniconda3/envs/CircleNet/bin/python3.7");  // Python interpreter
-            command.add(qupathModelDir + "/unet_validation_slide.py");  // Use the downloaded Python script
-            command.add("--data_dir");
+            command.add(qupathModelDir + "/inference_wsi_level_kpis.py");  // Use the downloaded Python script
+            command.add("--input");
             command.add(iomDirs.get(0).toPath().toString());
-            command.add("--model_dir");
-            command.add(iomDirs.get(2).toPath().toString());
+
             command.add("--output_dir");
             command.add(iomDirs.get(1).toPath().toString());
-            command.add("--X20_dir");
-            command.add(iomDirs.get(3).toPath().toString());
-            command.add("--X20_patch_dir");
-            command.add(iomDirs.get(4).toPath().toString());
+            
+            command.add("--ckpt");
+            command.add(iomDirs.get(2).toPath().toString());
 
+            command.add("--config");
+            command.add(iomDirs.get(3).toPath().toString());
 
             // Run the process
             ProcessBuilder processBuilder = new ProcessBuilder(command);
