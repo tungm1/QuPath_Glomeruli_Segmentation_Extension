@@ -237,12 +237,12 @@ public class GLOMainCommand {
 
             // Prepare Python command to run the downloaded script
             List<String> command = new ArrayList<>();
-            command.add("/home/VANDERBILT/tungm1/miniconda3/bin/python");  // Python interpreter
+            command.add("/home/VANDERBILT/tungm1/miniconda3/envs/KPISegmentation/bin/python3");  // Python interpreter
             command.add(qupathModelDir + "/inference_wsi_level_kpis.py");  // Use the downloaded Python script
             command.add("--input");
             command.add(iomDirs.get(0).toPath().toString());
 
-            command.add("--output_dir");
+            command.add("--output");
             command.add(iomDirs.get(1).toPath().toString());
             
             command.add("--ckpt");
