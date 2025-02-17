@@ -115,19 +115,27 @@ public class GLOMainCommand {
         ArrayList<File> iomDirs = new ArrayList<File>();
 
         File inputDir = new File(desktopDir + "/input_slide/");
-        if (inputDir.exists()) inputDir.delete();
+        if (inputDir.exists()) {
+            deleteDirectory(inputDir);
+        }
         inputDir.mkdirs();
 
         File outputDir = new File(desktopDir + "/output_slide/");
-        if (outputDir.exists()) outputDir.delete();
+        if (outputDir.exists()) {
+            deleteDirectory(outputDir);
+        }
         outputDir.mkdirs();
 
         File modelDir = new File(desktopDir + "/model/");
-        if (modelDir.exists()) modelDir.delete();
+        if (modelDir.exists()) {
+            deleteDirectory(modelDir);
+        }
         modelDir.mkdirs();
 
         File configDir = new File(desktopDir + "/config/");
-        if (configDir.exists()) configDir.delete();
+        if (configDir.exists()) {
+            deleteDirectory(configDir);
+        }
         configDir.mkdirs();
 
         iomDirs.add(inputDir);
@@ -139,17 +147,30 @@ public class GLOMainCommand {
     }
 
     
+    public static void deleteDirectory(File dir) {
+        File[] files = dir.listFiles();
+        if (files != null) { // Check if directory is non-empty
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file); // Recursively delete subdirectories
+                }
+                file.delete(); // Delete files
+            }
+        }
+        dir.delete(); // Finally delete the main directory
+    }
+
 
     // Method to download .pth files and Python scripts
-    public void downloadResources(String pthLink, String configLink, String pyURL, String destinationDir) throws IOException {
+    public void downloadResources(String pthLink, String configLink, String pyURL, String destinationDir, String configDir) throws IOException {
         // Download all .pth files
         String[] urlParts = pthLink.split("/");
         String pthFileName = urlParts[urlParts.length - 1];  // Extract the original file name from the URL
         String destinationPath = destinationDir + "/" + pthFileName;
         downloadFile(pthLink, destinationPath);
 
-        destinationPath = destinationDir + "/" + "config.py";
-        downloadFile(configLink, destinationPath);
+        configDir = configDir + "/" + "config.py";
+        downloadFile(configLink, configDir);
 
         urlParts = pyURL.split("/");
         String pyFileName = urlParts[urlParts.length - 1];  // Extract the original file name from the URL
@@ -191,6 +212,7 @@ public class GLOMainCommand {
             ArrayList<File> iomDirs = createInitialDirs();
 
             String qupathModelDir = iomDirs.get(2).toPath().toString();
+            String configDir = iomDirs.get(3).toPath().toString();
 
             // Set folder permissions after creating the directory
             setFolderPermissions(qupathModelDir);
@@ -205,7 +227,7 @@ public class GLOMainCommand {
             String pyURL = "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/refs/heads/main/Code_to_Michael/Validation_slide_docker/src/inference_wsi_level_kpis.py";
 
             // Download resources (Python scripts and .pth files) to the QuPath models directory
-            downloadResources(pthLink, configLink, pyURL, qupathModelDir);
+            downloadResources(pthLink, configLink, pyURL, qupathModelDir, configDir);
 
             // Set the directory where the models and Python scripts are located
             // String loadModelDir = qupathModelDir;
@@ -245,11 +267,12 @@ public class GLOMainCommand {
             command.add("--output");
             command.add(iomDirs.get(1).toPath().toString());
             
+            // model
             command.add("--ckpt");
-            command.add(iomDirs.get(2).toPath().toString());
+            command.add(iomDirs.get(2).toPath().toString() + "/mask2former_swin_b_kpis_768_best_mDice.pth");
 
             command.add("--config");
-            command.add(iomDirs.get(3).toPath().toString());
+            command.add(iomDirs.get(3).toPath().toString() + "/config.py");
 
             // Run the process
             ProcessBuilder processBuilder = new ProcessBuilder(command);
