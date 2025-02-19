@@ -251,7 +251,7 @@ public class GLOMainCommand {
 
 
             if (wsiName.endsWith(".tiff")) {
-                wsiName = wsiName.replace(".tiff", ".geojson");
+                // wsiName = wsiName.replace(".tiff", ".geojson");
             } else {
                 logger.warn("Unsupported WSI format for file: " + wholeSlideImagePath);
                 return;
@@ -262,7 +262,7 @@ public class GLOMainCommand {
             command.add("/home/VANDERBILT/tungm1/miniconda3/envs/KPISegmentation/bin/python3");  // Python interpreter
             command.add(qupathModelDir + "/inference_wsi_level_kpis.py");  // Use the downloaded Python script
             command.add("--input");
-            command.add(iomDirs.get(0).toPath().toString());
+            command.add(iomDirs.get(0).toPath().toString() + "/" + wsiName);
 
             command.add("--output");
             command.add(iomDirs.get(1).toPath().toString());
