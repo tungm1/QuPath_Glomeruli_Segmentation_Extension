@@ -206,11 +206,10 @@ public class GLOMainCommand {
         try {
             // QuPath directory setup based on OS
             String desktopDir = getDesktopDirectory();  // Get the QuPath directory based on the OS
-            //String qupathModelDir = desktopDir + "/models_and_pythonfiles_v2";  // Create a models folder in the QuPath directory
-            //Files.createDirectories(Paths.get(qupathModelDir));
 
             ArrayList<File> iomDirs = createInitialDirs();
 
+            String outputDir = iomDirs.get(1).toPath().toString();
             String qupathModelDir = iomDirs.get(2).toPath().toString();
             String configDir = iomDirs.get(3).toPath().toString();
 
@@ -229,9 +228,6 @@ public class GLOMainCommand {
             // Download resources (Python scripts and .pth files) to the QuPath models directory
             downloadResources(pthLink, configLink, pyURL, qupathModelDir, configDir);
 
-            // Set the directory where the models and Python scripts are located
-            // String loadModelDir = qupathModelDir;
-
             // Get WSI path
             String rawPath = qupath.getViewer().getImageData().getServer().getPath();
             String wholeSlideImagePath = rawPath.contains("file:") ? rawPath.split("file:")[1].trim() : rawPath;
@@ -248,14 +244,6 @@ public class GLOMainCommand {
             Path newdirP = iomDirs.get(0).toPath();
 
             Files.copy(sourceP, newdirP.resolve(sourceP.getFileName()));
-
-
-            if (wsiName.endsWith(".tiff")) {
-                // wsiName = wsiName.replace(".tiff", ".geojson");
-            } else {
-                logger.warn("Unsupported WSI format for file: " + wholeSlideImagePath);
-                return;
-            }
 
             // Prepare Python command to run the downloaded script
             List<String> command = new ArrayList<>();
@@ -296,37 +284,22 @@ public class GLOMainCommand {
             int exitCode = process.waitFor();
             if (exitCode != 0) {
                 logger.error("Python script exited with error code: " + exitCode);
-                //logger.error("Python script output: " + output.toString());
             } else {
                 logger.info("Python script executed successfully.");
-                //logger.info("Python script output: " + output.toString());
             }
 
-            // Call the method of generating Geojson path
-            String targetDir= qupathModelDir + "/test_only_result";
-            String geojsonDir = generateGeoJsonPath(targetDir);  // targetDir replaced by geojsonDir
+            if (wsiName.endsWith(".tiff")) {
+                wsiName = wsiName.replace(".tiff", ".geojson");
+            } else {
+                logger.warn("Unsupported WSI format for file: " + wholeSlideImagePath);
+                return;
+            }
+
             // Output results
-            parsePythonOutput(output.toString(), geojsonDir, wsiName);
-            
+            loadGeoJsonToQuPath(outputDir, wsiName);
         } catch (IOException | InterruptedException e) {
             logger.error("Error during process execution", e);
         }
-    }
-
-    // Methods to generate Geojson to save directory paths
-    private String generateGeoJsonPath(String targetDir) {
-        Path targetDirPath = Paths.get(targetDir);
-        String baseName = targetDirPath.getFileName().toString();
-        String geoJsonDir = targetDirPath.getParent().resolve(baseName + "_geojson").toString();
-        return geoJsonDir;
-    }
-
-    // The method is used to analyze Python output and load the Geojson file to Qupath
-    private void parsePythonOutput(String output, String geojsonDir, String wsiName) {
-        // Here you can add analytical logic of python output
-
-        // Load the generated Geojson file
-        loadGeoJsonToQuPath(geojsonDir, wsiName);
     }
 
     // The method is used to load the Geojson file to Qupath
