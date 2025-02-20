@@ -290,7 +290,7 @@ public class GLOMainCommand {
 
             while ((line = reader.readLine()) != null) {
                 output.append(line).append("\n");
-                //System.out.println(line);
+                System.out.println(line);
             }
 
             int exitCode = process.waitFor();
