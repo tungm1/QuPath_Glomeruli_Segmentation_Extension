@@ -290,16 +290,16 @@ public class GLOMainCommand {
 
             while ((line = reader.readLine()) != null) {
                 output.append(line).append("\n");
-                System.out.println(line);
+                //System.out.println(line);
             }
 
             int exitCode = process.waitFor();
             if (exitCode != 0) {
                 logger.error("Python script exited with error code: " + exitCode);
-                logger.error("Python script output: " + output.toString());
+                //logger.error("Python script output: " + output.toString());
             } else {
                 logger.info("Python script executed successfully.");
-                logger.info("Python script output: " + output.toString());
+                //logger.info("Python script output: " + output.toString());
             }
 
             // Call the method of generating Geojson path
