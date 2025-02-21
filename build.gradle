@@ -40,10 +40,10 @@ ext.qupathJavaVersion = 17
  */
 dependencies {
 
-	// QuPath user interface jar
-    shadow "io.github.qupath:qupath-gui-fx:${qupathVersion}" // 使用 QuPath 的 GUI 版本
+    // QuPath user interface jar
+    shadow "io.github.qupath:qupath-gui-fx:${qupathVersion}" // Using QuPath's GUI
 
-    // 如果只需要核心库，可以使用 core
+    // If you only need the core library, you can use core
     shadow "io.github.qupath:qupath-core:${qupathVersion}"
 
     // Main QuPath user interface jar.
@@ -172,6 +172,4 @@ repositories {
     maven {
         url "https://maven.scijava.org/content/repositories/snapshots"
     }
-
-
 }
