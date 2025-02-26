@@ -247,35 +247,26 @@ public class GLOMainCommand {
 
             // Prepare Python command to run the downloaded script
             List<String> command = new ArrayList<>();
-            command.add("/home/VANDERBILT/tungm1/miniconda3/envs/KPISegmentation/bin/python3");  // Python interpreter
-            command.add(qupathModelDir + "/inference_wsi_level_kpis.py");  // Use the downloaded Python script
+            command.add("/home/VANDERBILT/tungm1/glomeruli_segmentation_src/dist/inference_wsi_level_kpis/inference_wsi_level_kpis");
+
             command.add("--input");
             command.add(iomDirs.get(0).toPath().toString() + "/" + wsiName);
-
             command.add("--output");
             command.add(iomDirs.get(1).toPath().toString());
-            
-            // model
-            command.add("--ckpt");
+            command.add("--ckpt"); // model
             command.add(iomDirs.get(2).toPath().toString() + "/mask2former_swin_b_kpis_768_best_mDice.pth");
-
             command.add("--config");
             command.add(iomDirs.get(3).toPath().toString() + "/config.py");
 
             // Run the process
             ProcessBuilder processBuilder = new ProcessBuilder(command);
-            Map<String, String> env = processBuilder.environment();
-            env.put("PATH", "/home/VANDERBILT/tungm1/miniconda3/envs/CircleNet/bin:" + env.get("PATH"));
-            env.put("PYTHONPATH", "/home/VANDERBILT/tungm1/.local/lib/python3.7/site-packages");
             processBuilder.redirectErrorStream(true);
-
             Process process = processBuilder.start();
 
             // Capture the output
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             StringBuilder output = new StringBuilder();
-
             while ((line = reader.readLine()) != null) {
                 output.append(line).append("\n");
                 System.out.println(line);
