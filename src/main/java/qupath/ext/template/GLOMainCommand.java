@@ -37,8 +37,8 @@ import java.util.zip.ZipInputStream;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Set;
 import java.util.HashSet;
-
-
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class GLOMainCommand {
 
@@ -51,22 +51,21 @@ public class GLOMainCommand {
         this.qupath = qupath;
     }
 
-
     public void setFolderPermissions(String folderPath) throws IOException {
-    Path path = Paths.get(folderPath);
-    
-    Set<PosixFilePermission> perms = new HashSet<>();
-    perms.add(PosixFilePermission.OWNER_READ);
-    perms.add(PosixFilePermission.OWNER_WRITE);
-    perms.add(PosixFilePermission.OWNER_EXECUTE);
-    perms.add(PosixFilePermission.GROUP_READ);
-    perms.add(PosixFilePermission.GROUP_WRITE);
-    perms.add(PosixFilePermission.GROUP_EXECUTE);
-    perms.add(PosixFilePermission.OTHERS_READ);
-    perms.add(PosixFilePermission.OTHERS_WRITE);
-    perms.add(PosixFilePermission.OTHERS_EXECUTE);
-    
-    Files.setPosixFilePermissions(path, perms);
+        Path path = Paths.get(folderPath);
+        
+        Set<PosixFilePermission> perms = new HashSet<>();
+        perms.add(PosixFilePermission.OWNER_READ);
+        perms.add(PosixFilePermission.OWNER_WRITE);
+        perms.add(PosixFilePermission.OWNER_EXECUTE);
+        perms.add(PosixFilePermission.GROUP_READ);
+        perms.add(PosixFilePermission.GROUP_WRITE);
+        perms.add(PosixFilePermission.GROUP_EXECUTE);
+        perms.add(PosixFilePermission.OTHERS_READ);
+        perms.add(PosixFilePermission.OTHERS_WRITE);
+        perms.add(PosixFilePermission.OTHERS_EXECUTE);
+        
+        Files.setPosixFilePermissions(path, perms);
     }
 
     public void downloadFile(String fileUrl, String destinationPath) throws IOException {
@@ -146,7 +145,6 @@ public class GLOMainCommand {
         return iomDirs;
     }
 
-    
     public static void deleteDirectory(File dir) {
         File[] files = dir.listFiles();
         if (files != null) { // Check if directory is non-empty
@@ -160,23 +158,75 @@ public class GLOMainCommand {
         dir.delete(); // Finally delete the main directory
     }
 
-
-    // Method to download .pth files and Python scripts
-    public void downloadResources(String pthLink, String configLink, String pyURL, String destinationDir, String configDir) throws IOException {
-        // Download all .pth files
+    // Method to download .pth files, Python scripts, and Linux executable parts
+    public void downloadResources(String pthLink, String configLink, String destinationDir, String configDir, 
+                                String linuxExe1, String linuxExe2) throws IOException {
+        // Download the .pth file if it doesn't exist
         String[] urlParts = pthLink.split("/");
         String pthFileName = urlParts[urlParts.length - 1];  // Extract the original file name from the URL
         String destinationPath = destinationDir + "/" + pthFileName;
-        downloadFile(pthLink, destinationPath);
+        File pthFile = new File(destinationPath);
+        if (!pthFile.exists()) {
+            downloadFile(pthLink, destinationPath);
+        } else {
+            System.out.println("Model file already exists, skipping download: " + destinationPath);
+        }
 
-        configDir = configDir + "/" + "config.py";
-        downloadFile(configLink, configDir);
+        // Define the final executable file name (without the part suffix)
+        String finalExeName = "inference_wsi_level_kpis";
+        String finalExePath = destinationDir + "/" + finalExeName;
+        File finalExe = new File(finalExePath);
+        
+        // Check if the final executable already exists
+        if (finalExe.exists()) {
+            System.out.println("Final executable already exists, skipping download of Linux executable parts: " + finalExePath);
+            // Optionally delete any leftover parts to clean up space
+            String partName1 = "inference_wsi_level_kpis.part.aa";
+            String partName2 = "inference_wsi_level_kpis.part.ab";
+            File part1 = new File(destinationDir + "/" + partName1);
+            if (part1.exists()) {
+                part1.delete();
+                System.out.println("Deleted leftover part: " + partName1);
+            }
+            File part2 = new File(destinationDir + "/" + partName2);
+            if (part2.exists()) {
+                part2.delete();
+                System.out.println("Deleted leftover part: " + partName2);
+            }
+        } else {
+            // Download Linux executable part 1 if it doesn't exist
+            String[] linuxUrlParts1 = linuxExe1.split("/");
+            String linuxFileName1 = linuxUrlParts1[linuxUrlParts1.length - 1];  // Extract the file name
+            destinationPath = destinationDir + "/" + linuxFileName1;
+            File linuxPart1 = new File(destinationPath);
+            if (!linuxPart1.exists()) {
+                downloadFile(linuxExe1, destinationPath);
+            } else {
+                System.out.println("Linux executable part 1 already exists, skipping download: " + destinationPath);
+            }
 
-        urlParts = pyURL.split("/");
-        String pyFileName = urlParts[urlParts.length - 1];  // Extract the original file name from the URL
-        destinationPath = destinationDir + "/" + pyFileName;
-        downloadFile(pyURL, destinationPath);
+            // Download Linux executable part 2 if it doesn't exist
+            String[] linuxUrlParts2 = linuxExe2.split("/");
+            String linuxFileName2 = linuxUrlParts2[linuxUrlParts2.length - 1];  // Extract the file name
+            destinationPath = destinationDir + "/" + linuxFileName2;
+            File linuxPart2 = new File(destinationPath);
+            if (!linuxPart2.exists()) {
+                downloadFile(linuxExe2, destinationPath);
+            } else {
+                System.out.println("Linux executable part 2 already exists, skipping download: " + destinationPath);
+            }
+        }
+
+        // Download config file if it doesn't exist
+        String configFilePath = configDir + "/" + "config.py";
+        File configFile = new File(configFilePath);
+        if (!configFile.exists()) {
+            downloadFile(configLink, configFilePath);
+        } else {
+            System.out.println("Config file already exists, skipping download: " + configFilePath);
+        }
     }
+
 
     // Method to determine the Desktop directory and create 'QuPath_extension_model' folder
     public String getDesktopDirectory() throws IOException {
@@ -191,7 +241,7 @@ public class GLOMainCommand {
             desktopDir = System.getProperty("user.home") + "/Desktop";
         } else if (os.contains("nix") || os.contains("nux") || os.indexOf("aix") > 0) {
             // On Linux, the desktop is also in the user's home directory
-            desktopDir = "/home/VANDERBILT/tungm1"+ "/Desktop";
+            desktopDir = "/home/VANDERBILT/tungm1" + "/Desktop";
         } else {
             throw new IOException("Unsupported operating system");
         }
@@ -199,6 +249,43 @@ public class GLOMainCommand {
         // Ensure the directory exists
         Files.createDirectories(Paths.get(desktopDir));
         return desktopDir;
+    }
+
+    /**
+     * Reassembles the executable from its split parts.
+     *
+     * @param partsDirectory The directory where the split parts are stored.
+     * @param partBaseName   The common base name of the parts (e.g., "inference_wsi_level_kpis").
+     * @param outputFilePath The path for the reassembled executable.
+     * @throws IOException If there is an error during reassembly.
+     */
+    private void reassembleExecutable(String partsDirectory, String partBaseName, String outputFilePath) throws IOException {
+        File dir = new File(partsDirectory);
+        // Expecting parts named like: inference_wsi_level_kpis.part.aa, inference_wsi_level_kpis.part.ab, etc.
+        File[] parts = dir.listFiles((d, name) -> name.startsWith(partBaseName + ".part."));
+        if (parts == null || parts.length == 0) {
+            throw new IOException("No parts found for reassembly in: " + partsDirectory);
+        }
+        
+        // Sort the parts alphabetically to ensure correct order
+        Arrays.sort(parts, Comparator.comparing(File::getName));
+        
+        File outputFile = new File(outputFilePath);
+        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            byte[] buffer = new byte[8192]; // 8KB buffer
+            for (File part : parts) {
+                try (FileInputStream fis = new FileInputStream(part)) {
+                    int bytesRead;
+                    while ((bytesRead = fis.read(buffer)) != -1) {
+                        fos.write(buffer, 0, bytesRead);
+                    }
+                }
+            }
+        }
+        
+        // Optionally, set executable permissions on the reassembled file
+        setFolderPermissions(outputFilePath);
+        System.out.println("Executable reassembled successfully at: " + outputFilePath);
     }
 
     // Submit detection task
@@ -225,8 +312,24 @@ public class GLOMainCommand {
             // URL for the Python scripts
             String pyURL = "https://raw.githubusercontent.com/tungm1/glomeruli_segmentation_src/refs/heads/main/Code_to_Michael/Validation_slide_docker/src/inference_wsi_level_kpis.py";
 
+            // URL for Linux executable part 1
+            String linuxExe1 = "https://github.com/tungm1/glomeruli_segmentation_src/raw/refs/heads/main/dist/inference_wsi_level_kpis.part.aa";
+            // URL for Linux executable part 2
+            String linuxExe2 = "https://github.com/tungm1/glomeruli_segmentation_src/raw/refs/heads/main/dist/inference_wsi_level_kpis.part.ab";
+
             // Download resources (Python scripts and .pth files) to the QuPath models directory
-            downloadResources(pthLink, configLink, pyURL, qupathModelDir, configDir);
+            downloadResources(pthLink, configLink, qupathModelDir, configDir, linuxExe1, linuxExe2);
+
+            // Before running the executable, reassemble it from its parts.
+            // they follow the naming pattern "inference_wsi_level_kpis.part.aa", etc.
+            String partBaseName = "inference_wsi_level_kpis";
+            String reassembledExecutablePath = qupathModelDir + "/" + partBaseName;
+            
+            // Only reassemble if the final executable does not already exist.
+            File reassembledExecutable = new File(reassembledExecutablePath);
+            if (!reassembledExecutable.exists()) {
+                reassembleExecutable(qupathModelDir, partBaseName, reassembledExecutablePath);
+            }
 
             // Get WSI path
             String rawPath = qupath.getViewer().getImageData().getServer().getPath();
@@ -245,9 +348,9 @@ public class GLOMainCommand {
 
             Files.copy(sourceP, newdirP.resolve(sourceP.getFileName()));
 
-            // Prepare Python command to run the downloaded script
+            // Prepare Python command to run the reassembled executable
             List<String> command = new ArrayList<>();
-            command.add("/home/VANDERBILT/tungm1/glomeruli_segmentation_src/dist/inference_wsi_level_kpis/inference_wsi_level_kpis");
+            command.add(reassembledExecutablePath);
 
             command.add("--input");
             command.add(iomDirs.get(0).toPath().toString() + "/" + wsiName);
@@ -293,15 +396,15 @@ public class GLOMainCommand {
         }
     }
 
-    // The method is used to load the Geojson file to Qupath
+    // The method is used to load the Geojson file to QuPath
     private void loadGeoJsonToQuPath(String geojsonDir, String wsiName) {
         File geojsonFile = new File(geojsonDir, wsiName); // Use the generated Geojson file name
         if (geojsonFile.exists()) {
             // Get the input stream of the file
             try (InputStream inputStream = new FileInputStream(geojsonFile)) {
-                // Use the readObjectsFromGeoJSON method provided by Pathio to read the Geojson file
+                // Use the readObjectsFromGeoJSON method provided by PathIO to read the Geojson file
                 List<PathObject> objects = PathIO.readObjectsFromGeoJSON(inputStream);
-                // Add the object to the hierarchical structure of Qupath
+                // Add the object to the hierarchical structure of QuPath
                 qupath.getViewer().getImageData().getHierarchy().addPathObjects(objects);
                 logger.info("GeoJSON file loaded successfully: " + geojsonFile.getAbsolutePath());
             } catch (IOException e) {
