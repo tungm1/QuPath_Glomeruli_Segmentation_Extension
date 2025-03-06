@@ -198,7 +198,7 @@ public class GLOMainCommand {
         } else if (os.contains("mac")) {
             desktopDir = System.getProperty("user.home") + "/Desktop";
         } else if (os.contains("nix") || os.contains("nux") || os.indexOf("aix") > 0) {
-            desktopDir = "/home/VANDERBILT/tungm1" + "/Desktop";
+            desktopDir = System.getProperty("user.home") + "/Desktop";
         } else {
             throw new IOException("Unsupported operating system");
         }
