@@ -252,8 +252,9 @@ public class GLOMainCommand {
             Path sourceP = tempWSI.toPath();
             Path newdirP = iomDirs.get(0).toPath();
 
+            System.out.println("Here1");
             Files.copy(sourceP, newdirP.resolve(sourceP.getFileName()));
-
+            System.out.println("Here2");
             // Prepare the command to run the executable
             List<String> command = new ArrayList<>();
             command.add(executablePath);
