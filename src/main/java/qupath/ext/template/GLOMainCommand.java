@@ -267,6 +267,11 @@ public class GLOMainCommand {
             command.add(iomDirs.get(3).toPath().toString() + "/config.py");
 
             executableFile.setExecutable(true);
+
+            System.out.println("Executable exists: " + executableFile.exists());
+            System.out.println("Executable can be read: " + executableFile.canRead());
+            System.out.println("Executable can be executed: " + executableFile.canExecute());
+
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
