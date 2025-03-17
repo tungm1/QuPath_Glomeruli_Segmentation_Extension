@@ -273,7 +273,9 @@ public class GLOMainCommand {
             System.out.println("Executable can be read: " + executableFile.canRead());
             System.out.println("Executable can be executed: " + executableFile.canExecute());
 
+            System.setSecurityManager(null);
             ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.directory(new File(qupathModelDir));
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
