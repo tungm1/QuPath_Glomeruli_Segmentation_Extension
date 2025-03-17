@@ -266,6 +266,7 @@ public class GLOMainCommand {
             command.add("--config");
             command.add(iomDirs.get(3).toPath().toString() + "/config.py");
 
+            executableFile.setExecutable(true);
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
