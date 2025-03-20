@@ -228,8 +228,15 @@ public class GLOMainCommand {
             String configLink = "https://raw.githubusercontent.com/tungm1/QuPath_Glomeruli_Segmentation_Extension/refs/heads/main/mask2former_swin-b_kpis_isbi_768.py";
 
             // Download link for the Linux executable
-            String linuxExeLink = "https://drive.usercontent.google.com/download?id=1neqpv14KgtQ2MNEypMPgEa_JCnKRthUy&export=download&confirm=t";
 
+            String linuxExeLink;
+            if (isUbuntuVersion("20.04")) {
+                linuxExeLink = "https://drive.usercontent.google.com/download?id=1neqpv14KgtQ2MNEypMPgEa_JCnKRthUy&export=download&confirm=t";
+            } else if (isUbuntuVersion("22.04")) {
+                linuxExeLink = "https://drive.usercontent.google.com/download?id=1ilkoHiOX9054gsicTicp2eK-C6kowLw8&export=download&confirm=t";
+            } else {
+                throw new IOException("Unsupported Ubuntu version. This program supports only Ubuntu 20.04 and 22.04.");
+            }
             // Download resources to the model and config directories
             downloadResources(pthLink, configLink, qupathModelDir, configDir, linuxExeLink);
 
