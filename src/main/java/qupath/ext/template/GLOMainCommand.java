@@ -207,6 +207,27 @@ public class GLOMainCommand {
         return desktopDir;
     }
 
+    private boolean isUbuntuVersion(String version) {
+        try {
+            File file = new File("/etc/os-release");
+            if (!file.exists()) {
+                return false;
+            }
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("VERSION_ID=") && line.contains(version)) {
+                    reader.close();
+                    return true;
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            logger.error("Error reading Ubuntu version", e);
+        }
+        return false;
+    }
+
     // Submit detection task
     public void submitDetectionTask() {
         try {
@@ -231,8 +252,10 @@ public class GLOMainCommand {
 
             String linuxExeLink;
             if (isUbuntuVersion("20.04")) {
+                System.out.println("Ubuntu 20.04 detected");
                 linuxExeLink = "https://drive.usercontent.google.com/download?id=1neqpv14KgtQ2MNEypMPgEa_JCnKRthUy&export=download&confirm=t";
             } else if (isUbuntuVersion("22.04")) {
+                System.out.println("Ubuntu 22.04 detected");
                 linuxExeLink = "https://drive.usercontent.google.com/download?id=1ilkoHiOX9054gsicTicp2eK-C6kowLw8&export=download&confirm=t";
             } else {
                 throw new IOException("Unsupported Ubuntu version. This program supports only Ubuntu 20.04 and 22.04.");
@@ -259,9 +282,7 @@ public class GLOMainCommand {
             Path sourceP = tempWSI.toPath();
             Path newdirP = iomDirs.get(0).toPath();
 
-            System.out.println("Here1");
             Files.copy(sourceP, newdirP.resolve(sourceP.getFileName()));
-            System.out.println("Here2");
             // Prepare the command to run the executable
             List<String> command = new ArrayList<>();
             command.add(executablePath);
@@ -280,7 +301,6 @@ public class GLOMainCommand {
             System.out.println("Executable can be read: " + executableFile.canRead());
             System.out.println("Executable can be executed: " + executableFile.canExecute());
 
-            System.setSecurityManager(null);
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.directory(new File(qupathModelDir));
             processBuilder.redirectErrorStream(true);
