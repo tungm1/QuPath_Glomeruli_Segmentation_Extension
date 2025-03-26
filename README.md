@@ -36,6 +36,9 @@ These commands perform the same functions as above, using the correct download U
 
 ### Note: The final command (sudo reboot) will restart your computer, which is required to complete the installation.
 
+## Alternative Option
+You can also download the install_cuda.sh file from this repository and run it. This will automatically check what Ubuntu version you have and run it. it will still reboot the computer.
+
 # WORKFLOW INSTRUCTIONS:
 
 * Currently works for QuPath 0.5.1 on Ubuntu 20.04 and 22.04. Simply drag in the .jar file (with Java 17+ installed). If running another version, you will not be able to download the executable. You should run QuPath via the terminal to see the log output. For example, running "/home/USER/Desktop/QuPath-v0.5.1-Linux/QuPath/bin/QuPath".
