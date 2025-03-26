@@ -2,6 +2,7 @@
 This is the QuPath extension for glomeruli segmentation created by the Biomedical Data Representation and Learning Lab (HRLB) at Vanderbilt.
 
 # FIRST-TIME RUN INSTRUCTIONS:
+### This first time install may take a while, and requires a solid internet connection. There may be compatibility issues if you have multiple versions of QuPath or CUDA installed.
 
 Check Your Ubuntu Version:
 Open a Terminal window and run the following command to display your Ubuntu version:
