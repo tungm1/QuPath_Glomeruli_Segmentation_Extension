@@ -48,6 +48,8 @@ You can also download the install_cuda.sh file from this repository and run it. 
 
 * The first time running the program, it may take several minutes. The .jar will install a PyInstaller compiled executable to your system which will run the segmentation script. This means you do not need to have Python or the many dependencies installed yourself. Around 4.5GB of files need to be downloaded (this means you must also have 4.5GB of free space on your machine). This may also momentarily cause the QuPath window to say it is not responding, but just wait for the console output to finish.
 
+### As for the output, the warnings beginning with "_distutils_hack/__init__.py:24: UserWarning: Distutils was imported before Setuptools" and "torch/functional.py:539: UserWarning: torch.meshgrid" are expected and can be ignored.
+
 Windows builds to come in the near future. MacOS is not planned for support.
 
 ### Model and original source code credit: https://github.com/huuquan1994/wsi_glomerulus_seg
